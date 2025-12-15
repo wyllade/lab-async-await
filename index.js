@@ -1,12 +1,6 @@
-// API URL
 const API_URL = 'https://jsonplaceholder.typicode.com/posts';
-
-// Get UL element
 const postListElement = document.getElementById('post-list');
 
-/**
- * Display posts in the DOM
- */
 function displayPosts(posts) {
   if (!postListElement) return;
 
@@ -16,7 +10,7 @@ function displayPosts(posts) {
     const li = document.createElement('li');
 
     const h1 = document.createElement('h1');
-    h1.textContent = post.title;
+    h1.textContent = post.title; // The test expects titles like 'sunt aut facere repellat...'
 
     const p = document.createElement('p');
     p.textContent = post.body;
@@ -27,17 +21,10 @@ function displayPosts(posts) {
   });
 }
 
-/**
- * Fetch posts asynchronously
- */
 async function fetchAndDisplayPosts() {
   try {
     const response = await fetch(API_URL);
-
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
-
+    if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
     const posts = await response.json();
     displayPosts(posts);
   } catch (error) {
@@ -45,5 +32,4 @@ async function fetchAndDisplayPosts() {
   }
 }
 
-// Initialize
 fetchAndDisplayPosts();
