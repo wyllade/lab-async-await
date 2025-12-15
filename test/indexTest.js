@@ -1,49 +1,63 @@
-// index.js
-
-// 1. FIX: Declare API_URL and postListElement globally
+// API endpoint for posts
 const API_URL = 'https://jsonplaceholder.typicode.com/posts';
+
+// Select the UL element
 const postListElement = document.getElementById('post-list');
 
+/**
+ * Display posts in the UL element.
+ * @param {Array} posts - Array of post objects from the API.
+ */
 function displayPosts(posts) {
-    // 2. FIX: Graceful exit if the element is not found (prevents TypeError)
+    // Check if UL exists
     if (!postListElement) {
         console.error("UL element with id 'post-list' not found.");
         return;
     }
 
-    postListElement.innerHTML = ''; 
+    // Clear existing posts
+    postListElement.innerHTML = '';
 
+    // Loop through posts and create elements
     posts.forEach(post => {
         const li = document.createElement('li');
 
-        const h1 = document.createElement('h1');
-        h1.textContent = post.title; // Should now work
+        const title = document.createElement('h1');
+        title.textContent = post.title;
 
-        const p = document.createElement('p');
-        p.textContent = post.body; // Should now work
+        const body = document.createElement('p');
+        body.textContent = post.body;
 
-        li.appendChild(h1);
-        li.appendChild(p);
-
+        li.appendChild(title);
+        li.appendChild(body);
         postListElement.appendChild(li);
     });
 }
 
+/**
+ * Fetch posts from the API and display them.
+ * Uses async/await with try/catch for error handling.
+ */
 async function fetchAndDisplayPosts() {
     try {
-        const response = await fetch(API_URL); // FIX: API_URL is now defined
-        
+        const response = await fetch(API_URL);
+
+        // Check if response is OK
         if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
+            throw new Error(`Failed to fetch posts. Status: ${response.status}`);
         }
 
         const posts = await response.json();
-        
-        displayPosts(posts); 
 
+        // Display posts in the DOM
+        displayPosts(posts);
     } catch (error) {
-        console.error('Failed to fetch or display posts:', error);
+        console.error('Error fetching posts:', error);
+        if (postListElement) {
+            postListElement.innerHTML = `<li style="color:red;">Error: ${error.message}</li>`;
+        }
     }
 }
 
+// Initialize app
 fetchAndDisplayPosts();
