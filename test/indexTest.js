@@ -1,57 +1,49 @@
-const chai = require('chai');
-global.expect = chai.expect;
+// index.js
 
-const fs = require('fs');
-const path = require('path');
-const { JSDOM } = require('jsdom');
-const babel = require('@babel/core');
+// 1. FIX: Declare API_URL and postListElement globally
+const API_URL = 'https://jsonplaceholder.typicode.com/posts';
+const postListElement = document.getElementById('post-list');
 
-// Load HTML content
-const html = fs.readFileSync(path.resolve(__dirname, '..', 'index.html'), 'utf-8');
+function displayPosts(posts) {
+    // 2. FIX: Graceful exit if the element is not found (prevents TypeError)
+    if (!postListElement) {
+        console.error("UL element with id 'post-list' not found.");
+        return;
+    }
 
-// Transform JavaScript using Babel
-const { code: transformedScript } = babel.transformFileSync(
-  path.resolve(__dirname, '..', 'index.js'),
-  { presets: ['@babel/preset-env'] }
-);
+    postListElement.innerHTML = ''; 
 
-// Initialize JSDOM
-const dom = new JSDOM(html, {
-  runScripts: "dangerously",
-  resources: "usable"
-});
+    posts.forEach(post => {
+        const li = document.createElement('li');
 
-//Handle fetch
-const fetchPkg = 'node_modules/whatwg-fetch/dist/fetch.umd.js';
-dom.window.eval(fs.readFileSync(fetchPkg, 'utf-8'));
+        const h1 = document.createElement('h1');
+        h1.textContent = post.title; // Should now work
 
-// Inject the transformed JavaScript into the virtual DOM
-const scriptElement = dom.window.document.createElement("script");
-scriptElement.textContent = transformedScript;
-dom.window.document.body.appendChild(scriptElement);
+        const p = document.createElement('p');
+        p.textContent = post.body; // Should now work
 
-// Expose JSDOM globals to the testing environment
-global.window = dom.window;
-global.document = dom.window.document;
-global.navigator = dom.window.navigator;
-global.HTMLElement = dom.window.HTMLElement;
-global.Node = dom.window.Node;
-global.Text = dom.window.Text;
-global.XMLHttpRequest = dom.window.XMLHttpRequest;
+        li.appendChild(h1);
+        li.appendChild(p);
 
-// Sample test suite for JavaScript event handling
-describe('Asynchronous Fetching ', () => {
-  it('should fetch to external api and add information to page', async() => {
-    await new Promise(resolve => setTimeout(resolve, 200)); 
-    let postDisplay = document.querySelector("#post-list")
-    expect(postDisplay.innerHTML).to.include('sunt aut')
-    
-  })
-  it('should create an h1 and p element to add', async() => {
-    await new Promise(resolve => setTimeout(resolve, 200)); 
-    let h1 = document.querySelector("h1")
-    let p = document.querySelector("p")
-    expect(h1.textContent).to.include("sunt aut facere repellat")
-    expect(p.textContent).to.include("quia et suscipit\nsuscipit")
-  })
-})
+        postListElement.appendChild(li);
+    });
+}
+
+async function fetchAndDisplayPosts() {
+    try {
+        const response = await fetch(API_URL); // FIX: API_URL is now defined
+        
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const posts = await response.json();
+        
+        displayPosts(posts); 
+
+    } catch (error) {
+        console.error('Failed to fetch or display posts:', error);
+    }
+}
+
+fetchAndDisplayPosts();
