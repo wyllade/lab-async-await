@@ -1,31 +1,49 @@
-// Write your code here!
-// index.js (Replacing the previous fetch block)
+// API URL
+const API_URL = 'https://jsonplaceholder.typicode.com/posts';
 
-// Create function to house fetch and apply async to function
-async function fetchAndDisplayPosts() {
-    try {
-        // Apply await to fetch
-        const response = await fetch(API_URL);
+// Get UL element
+const postListElement = document.getElementById('post-list');
 
-        // Check if the response is OK
-        if (!response.ok) {
-            // Throw an error to be caught by the catch block
-            throw new Error(`HTTP error! status: ${response.status}`);
-        }
+/**
+ * Display posts in the DOM
+ */
+function displayPosts(posts) {
+  if (!postListElement) return;
 
-        // Apply await to response.json() to parse the body
-        const posts = await response.json();
+  postListElement.innerHTML = '';
 
-        // Call displayPosts() function after successful fetch
-        displayPosts(posts);
+  posts.forEach(post => {
+    const li = document.createElement('li');
 
-    } catch (error) {
-        // Standard error handling for async/await is a try...catch block
-        console.error('Failed to fetch or display posts:', error);
-        // Optional: Display an error message to the user
-        postListElement.innerHTML = '<li>Error loading posts. Please try again later.</li>';
-    }
+    const h1 = document.createElement('h1');
+    h1.textContent = post.title;
+
+    const p = document.createElement('p');
+    p.textContent = post.body;
+
+    li.appendChild(h1);
+    li.appendChild(p);
+    postListElement.appendChild(li);
+  });
 }
 
-// Call the async function to start the process
+/**
+ * Fetch posts asynchronously
+ */
+async function fetchAndDisplayPosts() {
+  try {
+    const response = await fetch(API_URL);
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    const posts = await response.json();
+    displayPosts(posts);
+  } catch (error) {
+    console.error('Failed to fetch or display posts:', error);
+  }
+}
+
+// Initialize
 fetchAndDisplayPosts();
