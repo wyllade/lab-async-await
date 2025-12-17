@@ -19,6 +19,22 @@ function displayPosts(posts) {
   // Clear any existing content inside the list
   postList.innerHTML = '';
 
+  posts.forEach(post => {
+    // Append the post title into the EXISTING h1
+    header.textContent += ` ${post.title}`;
+
+    // Create paragraph element for post body
+    const p = document.createElement('p');
+    p.textContent = post.body;
+
+    // Create list item and append paragraph
+    const li = document.createElement('li');
+    li.appendChild(p);
+
+    // Append list item to the ul
+    postList.appendChild(li);
+  });
+}
   // Loop through each post in the array
   posts.forEach(post => {
     // Create a list item to hold each post
@@ -39,7 +55,7 @@ function displayPosts(posts) {
     // Append the list item to the <ul>
     postList.appendChild(li);
   });
-}
+
 
 // ===============================
 // Function: fetchPosts (Async/Await)
