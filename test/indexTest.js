@@ -1,63 +1,69 @@
-// API endpoint for posts
+// ===============================
+// API URL
+// ===============================
+// This is the external API we are fetching posts from
 const API_URL = 'https://jsonplaceholder.typicode.com/posts';
 
-// Select the UL element
-const postListElement = document.getElementById('post-list');
+// ===============================
+// DOM Reference
+// ===============================
+// Select the <ul> element where posts will be displayed
+const postList = document.getElementById('post-list');
 
-/**
- * Display posts in the UL element.
- * @param {Array} posts - Array of post objects from the API.
- */
+// ===============================
+// Function: displayPosts
+// ===============================
+// This function receives an array of post objects
+// and displays each post on the page
 function displayPosts(posts) {
-    // Check if UL exists
-    if (!postListElement) {
-        console.error("UL element with id 'post-list' not found.");
-        return;
-    }
+  // Clear any existing content inside the list
+  postList.innerHTML = '';
 
-    // Clear existing posts
-    postListElement.innerHTML = '';
+  // Loop through each post in the array
+  posts.forEach(post => {
+    // Create a list item to hold each post
+    const li = document.createElement('li');
 
-    // Loop through posts and create elements
-    posts.forEach(post => {
-        const li = document.createElement('li');
+    // Create an h1 element for the post title
+    const h1 = document.createElement('h1');
+    h1.textContent = post.title; // Set title text
 
-        const title = document.createElement('h1');
-        title.textContent = post.title;
+    // Create a paragraph element for the post body
+    const p = document.createElement('p');
+    p.textContent = post.body; // Set body text
 
-        const body = document.createElement('p');
-        body.textContent = post.body;
+    // Append title and body to the list item
+    li.appendChild(h1);
+    li.appendChild(p);
 
-        li.appendChild(title);
-        li.appendChild(body);
-        postListElement.appendChild(li);
-    });
+    // Append the list item to the <ul>
+    postList.appendChild(li);
+  });
 }
 
-/**
- * Fetch posts from the API and display them.
- * Uses async/await with try/catch for error handling.
- */
-async function fetchAndDisplayPosts() {
-    try {
-        const response = await fetch(API_URL);
+// ===============================
+// Function: fetchPosts (Async/Await)
+// ===============================
+// This function fetches posts from the API
+// using async/await for cleaner asynchronous code
+async function fetchPosts() {
+  try {
+    // Send request to the API and wait for the response
+    const response = await fetch(API_URL);
 
-        // Check if response is OK
-        if (!response.ok) {
-            throw new Error(`Failed to fetch posts. Status: ${response.status}`);
-        }
+    // Convert the response into JavaScript objects
+    const posts = await response.json();
 
-        const posts = await response.json();
-
-        // Display posts in the DOM
-        displayPosts(posts);
-    } catch (error) {
-        console.error('Error fetching posts:', error);
-        if (postListElement) {
-            postListElement.innerHTML = `<li style="color:red;">Error: ${error.message}</li>`;
-        }
-    }
+    // Call displayPosts to render posts on the page
+    displayPosts(posts);
+  } catch (error) {
+    // Log any errors that occur during fetching
+    console.error('Error fetching posts:', error);
+  }
 }
 
-// Initialize app
-fetchAndDisplayPosts();
+// ===============================
+// Load Data When Page Loads
+// ===============================
+// Wait until the DOM is fully loaded before fetching posts
+document.addEventListener('DOMContentLoaded', fetchPosts);
